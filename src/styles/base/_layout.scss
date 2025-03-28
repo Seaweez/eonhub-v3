@@ -1,0 +1,11 @@
+@layer base {
+  body {
+    @apply font-sans text-foreground;
+  }
+
+  .container {
+    @screen sm {
+      @apply px-5 #{!important};
+    }
+  }
+}

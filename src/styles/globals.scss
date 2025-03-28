@@ -1,0 +1,8 @@
+@tailwind base;
+@import './base/root';
+@import './base/layout';
+
+@tailwind components;
+@import './components/swiper';
+
+@tailwind utilities;

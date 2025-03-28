@@ -1,0 +1,1056 @@
+// "use client"
+// import { Fragment, useEffect, useState } from 'react'
+
+// import { cn } from '@/utils/styling'
+// import Image from 'next/image'
+
+// import { Pagination, Navigation } from 'swiper/modules'
+// import { Swiper, SwiperSlide } from 'swiper/react'
+
+// import { format } from 'date-fns'
+
+// import 'swiper/css'
+// import 'swiper/css/pagination'
+// import 'swiper/css/navigation'
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+// import { faArrowUp, faCircleArrowDown, faCircleArrowUp } from '@fortawesome/free-solid-svg-icons'
+// import useSound from 'use-sound'
+// import IconArrowCircleLeft from '@/components/icons/icon-arrow-circle-left'
+// import IconArrowCircleRight from '@/components/icons/icon-arrow-circle-right'
+// import { eonhubApiCreate } from '@/axios'
+// import { IEonUserDetail, SEAL_METAVERSE_GAME_ID, ZERO_ETERNAL_LOVE_GAME_ID } from '@/types/eonhub'
+// import { useCookies } from 'react-cookie'
+// import MarketService, { InventoryResponseDTO, MarketHistoryResponse, MarketItemResponseDTO, MarketList, UserInfoResponseDTO } from '@/services/market.service'
+// import { useAtom } from 'jotai'
+// import { SealMetaverseAccountInfoAtom, ZeroEternalLoveAccountInfoAtom, displayMarketZeroHistoryAtom, inventoryInGameWhitelistZeroAtom, inventoryZeroAtom, marketHistoryZeroAtom, marketZeroAtom, marketZeroInventoryAtom, marketZeroTaxAtom, selectedServerAtom, userMarketHistoryZeroAtom, userMarketListZeroAtom, userWalletHistoryAtom } from '@/atoms/eonhub'
+// import marketService from '@/services/market.service'
+// import Swal from 'sweetalert2'
+// import UserService from '@/services/user.service'
+// import { IZeroEternalLoveAccountInfo, IZeroEternalLoveCharInfo } from '@/types/zero-eternal-love'
+// import { useWalletSigner } from '@/hooks/useWeb3Token'
+// import { useWeb3React } from '@web3-react/core'
+// import { providers } from 'ethers'
+// import { toast } from 'react-toastify'
+// import { COINS_LIST } from '@/constants/eonhub'
+// import { InventoryInGameZero } from '@/components/zero-eternal-love/inventoryWhitelist'
+// import { InventoryNft } from '@/components/zero-eternal-love/inventoryNFT'
+// import { MarketplaceZeroUserListingItems } from '@/components/zero-eternal-love/userMarketListing'
+
+
+// interface IPageProps { }
+
+// const Page = ({ }: IPageProps) => {
+
+//   const [cookie, setCookie] = useCookies(["eonhub-auth"]);
+//   const userCookie: IEonUserDetail = cookie["eonhub-auth"];
+//   const eonhubAPI = eonhubApiCreate(userCookie?.token);
+
+//   const marketService = new MarketService()
+//   const [marketZeroInventory, setmarketZeroInventory] = useAtom(marketZeroInventoryAtom);
+//   const [inventoryZero, setInventoryZero] = useAtom(inventoryZeroAtom);
+//   const [marketZero, setMarketZeroAtom] = useAtom(marketZeroAtom);
+//   const [inventoryIngameWhitelistZero, setInventoryIngameWhitelistZero] = useAtom(inventoryInGameWhitelistZeroAtom);
+//   const [userMarketListZero, setUserMarketListZero] = useAtom(userMarketListZeroAtom);
+//   const [userMarketHistoryZero, setUserMarketHistoryZero] = useAtom(userMarketHistoryZeroAtom);
+//   const [marketHistoryZero, setMarketHistoryZero] = useAtom(marketHistoryZeroAtom);
+//   const [marketZeroTax, setMarketZeroTax] = useAtom(marketZeroTaxAtom);
+//   const [historyType, setHistoryType] = useState(`SELL`)
+//   const [userWalletHistory, setUserWalletHistory] = useAtom(userWalletHistoryAtom);
+
+//   const [selectedDisplayHistory, setSelectedDisplayHistory] = useState(`wallet-history`)
+
+//   useEffect(() => {
+//     if (!userCookie || !userCookie?.token) return
+//     const inventoryZero = marketService.getMyInventory(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//       .then(res => {
+
+//         setInventoryZero(res)
+//       })
+//       .catch(err => { console.log('inventoryZero: ', err) })
+//     const marketZeroInventory = marketService.getUserMarketInfo(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//       .then(res => {
+//         setmarketZeroInventory(res)
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+//     const marketZeroInventory2 = marketService.getMarketItemList(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//       .then(res => {
+//         const marketItem = res as MarketList[] || [];
+//         setMarketZeroAtom(marketItem)
+//         // setmarketZeroInventory(res)
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+
+//     // const zeroInventoryWhitelist = marketService.getUserWhiteListItem(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//     //   .then(res => {
+//     //     const whitelistItems = res as MarketItemResponseDTO
+//     //     setInventoryIngameWhitelistZero(whitelistItems)
+//     //   })
+//     //   .catch(err => { console.log('marketZeroInventory: ', err) })
+
+//     const zeroUserMarketList = marketService.getMyMarketItemList(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//       .then(res => {
+//         const userMarketList = res as MarketList[]
+//         setUserMarketListZero(userMarketList)
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+
+//     const zeroUserMarketHistory = marketService.getMarketHistory(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token, true, historyType)
+//       .then(res => {
+//         const userMarketHistory = res as MarketHistoryResponse[]
+//         setUserMarketHistoryZero(userMarketHistory)
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+//     const zeroRecentlySold = marketService.getMarketRecentlySold(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//       .then(res => {
+//         const recentlySold = res as any
+//         setMarketHistoryZero(recentlySold)
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+
+//     const marketZeroTax = marketService.getTotalTaxHistory(ZERO_ETERNAL_LOVE_GAME_ID)
+//       .then(res => {
+//         setMarketZeroTax(res || { totalReferralSystem: 0, totalTax: 0, marketplaceTax: 0 })
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+
+
+//     const userWalletHistory = marketService.getUserWalletHistory(userCookie?.token)
+//       .then(res => {
+//         setUserWalletHistory(res)
+//       })
+//       .catch(err => { console.log('userWalletHistory: ', err) })
+
+//   }, [userCookie])
+
+//   useEffect(() => {
+//     const zeroUserMarketHistory = marketService.getMarketHistory(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token, true, historyType)
+//       .then(res => {
+//         const userMarketHistory = res as MarketHistoryResponse[]
+//         setUserMarketHistoryZero(userMarketHistory)
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+//   }, [historyType])
+//   return (
+//     <Fragment>
+//       {/* <section className={cn(`mt-32 mb-10`)}>
+//         <div className={cn(`container`)}>
+//           <h1 className={cn(`text-center text-[64px] font-bold`)}>Inventory</h1>
+//         </div>
+//       </section> */}
+
+//       {/* <iframe
+//   height="625"
+//   title="TransFi Ramp Widget"
+//   src="https://buy.transfi.com?apiKey=HSTc301WOgluUUca&[QUERY_PARAMETERS]"
+//   allowTransparency
+//   allowFullScreen 
+// >
+// </iframe> */}
+
+//       <div className="mt-20">
+//         <Marketplace />
+//       </div>
+
+
+//       <Swiper
+//         loop={true}
+//         navigation={{
+//           prevEl: '#news-navigation-prev',
+//           nextEl: '#news-navigation-next',
+//         }}
+//         modules={[Navigation]}
+//         className={cn(`[&>.swiper-wrapper]:pb-10`)}
+//         breakpoints={{
+//           319: {
+//             slidesPerView: 1.1,
+//             spaceBetween: 20,
+//             slidesOffsetBefore: 20,
+//             slidesOffsetAfter: 20,
+//           },
+//           641: {
+//             slidesPerView: 1.1,
+//             spaceBetween: 20,
+//             slidesOffsetBefore: 32,
+//             slidesOffsetAfter: 32,
+//           },
+//           1025: {
+//             slidesPerView: 1,
+//             spaceBetween: 40,
+//           },
+//         }}
+//       >
+
+
+//         <SwiperSlide
+//           key={`news-slide-${1}`}
+//           className={cn(
+//             `rounded-[40px]  `,
+//             `[&.swiper-slide-active>div]:bg-pink`,
+//             `[&.swiper-slide-active>div]:shadow-news`,
+//             `[&.swiper-slide-active]:border`,
+//             `[&.swiper-slide-active]:border-pink`,
+//             `[&.swiper-slide-active]:p-2`,
+//             `[&.swiper-slide-active]: `,
+//             `[&:not(.swiper-slide-active)_a]:hidden`,
+//           )}
+//         >
+//           <section className={cn(`section bg-[url('/images/games/inventory-cover.jpeg')] bg-cover min-w-fit flex min-h-96`,
+//             `rounded-[40px]  `,
+//             `[&.swiper-slide-active>div]:bg-pink`,
+//             `[&.swiper-slide-active>div]:shadow-news`,
+//             `[&.swiper-slide-active]:border`,
+//             `[&.swiper-slide-active]:border-pink`,
+//             `[&.swiper-slide-active]:p-2`,
+//             `[&.swiper-slide-active]: `,
+//             `[&:not(.swiper-slide-active)_a]:hidden`)}>
+//             {/* <div className="w-full flex justify-center">
+//               <Image alt='' src={`/images/games/02.png`} className={`rounded-2xl h-24`} height={100} width={100} />
+//             </div> */}
+//             <div className="grid grid-cols-2 lg:block text-center  justify-between">
+
+//               {/* <div className="block  p-10 w-full rounded-2xl flex justify-center">
+//                 <ExchangeToken gameId={ZERO_ETERNAL_LOVE_GAME_ID} />
+//               </div> */}
+//               <div className="relative w-full p-10 lg:p-4 rounded-2xl">
+
+//                 <InventoryInGameZero data={inventoryIngameWhitelistZero} gameId={ZERO_ETERNAL_LOVE_GAME_ID} />
+
+//               </div>
+//               <div className="relative w-full p-10 lg:p-4 rounded-2xl">
+//                 <InventoryNft data={inventoryZero} gameId={ZERO_ETERNAL_LOVE_GAME_ID} />
+//               </div>
+//             </div>
+
+//           </section>
+
+//           <MarketplaceZeroUserListingItems />
+
+//           {/* {userMarketHistoryZero.map(e => (<>{e.actionByUserId}</>))} */}
+
+
+
+//         </SwiperSlide>
+
+
+//         <SwiperSlide
+//           key={`news-slide-${1}`}
+//           className={cn(
+//             `rounded-[40px] bg-[url('/images/games/seal-bg-01.png')] bg-cover min-w-fit`,
+//             `[&.swiper-slide-active>div]:bg-pink`,
+//             `[&.swiper-slide-active>div]:shadow-news`,
+//             `[&.swiper-slide-active]:border`,
+//             `[&.swiper-slide-active]:border-pink`,
+//             `[&.swiper-slide-active]:p-2`,
+//             `[&.swiper-slide-active]:text-white`,
+//             `[&:not(.swiper-slide-active)_a]:hidden`,
+//           )}
+//         >
+//           <section className={cn(`section`)}>
+//             <div className="w-full flex justify-center bg-[url('/images/games/inventory-cover.jpeg')] bg-cover  ">
+//             </div>
+//             <div className=" text-center flex justify-between">
+
+//               <div className=" w-2/4 p-10 rounded-2xl flex justify-center">
+//                 <ExchangeToken gameId={SEAL_METAVERSE_GAME_ID} />
+//               </div>
+//               <div className="relative w-2/4 p-10 rounded-2xl">
+//                 {/* <NftInventory data={[]} gameId={ZERO_ETERNAL_LOVE_GAME_ID} /> */}
+//               </div>
+//             </div>
+//           </section>
+//         </SwiperSlide>
+
+//       </Swiper>
+
+//       <div className={cn(`container`)}>
+//         {/* Navigation */}
+//         <div className={cn(`relative z-10 mt-8 flex items-center space-x-4`)}>
+//           <div className={cn(`h-[2px] w-full bg-card`)}></div>
+//           <div className={cn(`flex items-center space-x-2`)}>
+//             <button id="news-navigation-prev">
+//               <IconArrowCircleLeft className={cn(`text-[56px] text-pink`)} />
+//             </button>
+//             <button id="news-navigation-next">
+//               <IconArrowCircleRight className={cn(`text-[56px] text-pink`)} />
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       <RecentlySold />
+
+
+//       <div className="rounded-xl  p-10">
+//         <div className={`flex rounded-xl my-4 bg-info border-2 pt-4 w-fit text-white rounded-tr-2xl transition-all ${userWalletHistory?.length || userWalletHistory?.length ? `scale-100` : `scale-0`}`}>
+//           <div className="relative">
+//             <h2 className={`text-center mb-4  mx-4 cursor-pointer ${selectedDisplayHistory == `wallet-history` ? `font-bold` : ``}`}
+//               onClick={() => setSelectedDisplayHistory(`wallet-history`)}>Wallet History</h2>
+//           </div>
+//           <div className="flex">
+//             <h2 className={`text-center   mx-4 cursor-pointer ${selectedDisplayHistory == `market-history` ? `font-bold` : ``}`}
+//               onClick={() => setSelectedDisplayHistory(`market-history`)}>Transaction History</h2>
+
+//             <div className={`text-sm font-medium text-center   border- border-gray-200 transition-all ${selectedDisplayHistory == `market-history` ? `scale-100` : `-translate-x-full scale-x-0`}`}>
+//               <ul className="flex flex-wrap justify-center -mb-px -mb-4">
+//                 <li className="me-2">
+//                   <div onClick={() => { setHistoryType(`BUY`) }} className={`cursor-pointer inline-block px-4  border-2 rounded-full hover:text-white hover:font-bold hover:border-white pb-[2px] ${historyType === `BUY` ? `active text-white  border-white   shadow-md` : ` border-transparent`}`}>Buy</div>
+//                 </li>
+//                 <li className="me-2">
+//                   <div onClick={() => { setHistoryType(`SELL`) }} className={`cursor-pointer inline-block px-4  border-2 rounded-full hover:text-white hover:font-bold hover:border-white  pb-[2px] ${historyType === `SELL` ? `active text-white  border-white   shadow-md` : ` border-transparent`}`} aria-current="page">Sell</div>
+//                 </li>
+//               </ul>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* xxxxxxx */}
+//         {userWalletHistory && userWalletHistory?.length && selectedDisplayHistory == `wallet-history` ? (<>
+//           {/* <h2 className="text-center font-bold my-4">Wallet History</h2> */}
+//           <div className="relative overflow-x-auto sm:rounded-lg max-h-80 ">
+//             <table className="w-full mx-auto overflow-x-auto shadow-md text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 rounded-2xl border-2">
+//               <thead className="text-xs text-gray-700 uppercase bg-gray-50    ">
+//                 <tr className=''>
+//                   <th scope='col' className={`px-6 py-3`}>Type</th>
+//                   <th scope='col' className={`px-6 py-3`}>Amount</th>
+//                   <th scope='col' className={`px-6 py-3`}>Status</th>
+//                   <th scope='col' className={`px-6 py-3`}>Destination</th>
+//                   <th scope='col' className={`px-6 py-3`}>Created</th>
+//                 </tr>
+//               </thead>
+//               <tbody className={`  overflow-y-auto`}>
+//                 {userWalletHistory && userWalletHistory.map(history => (
+//                   <tr className="odd:bg-white even:bg-gray-50 border-b  hover:bg-info hover:text-white">
+//                     <td className="px-6 py-4">
+//                       {history.txnType}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       {history.eonAmount}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       {history.status}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       {history.destinationUserEmail}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       {history.createdTime.toString()}
+//                     </td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         </>) : (<></>)}
+
+//         {userMarketHistoryZero && userMarketHistoryZero.length && selectedDisplayHistory == `market-history` ? (<>
+
+
+//           <div className="relative overflow-x-auto   sm:rounded-lg max-h-80">
+//             <table className=" text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 w-full mx-auto overflow-x-auto shadow-md ">
+//               <thead className="text-xs text-gray-700 uppercase bg-gray-50    ">
+//                 <tr>
+//                   {(userMarketHistoryZero && userMarketHistoryZero.length) ? Object.keys(userMarketHistoryZero[0]).map(key => (<th scope='col' className={`px-6 py-3`}>{`${key}`}</th>)) : ``}
+
+//                 </tr>
+//               </thead>
+//               <tbody className={`  overflow-y-auto`}>
+
+//                 {userMarketHistoryZero && userMarketHistoryZero.map(history => (
+//                   <tr className="odd:bg-white even:bg-gray-50 even:    border-b  hover:bg-info hover:text-white">
+//                     {Object.values(history).map(historyVal =>
+//                       historyVal.toString().includes(`imagekit`) ? (<th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><Image alt={`${historyVal}`} src={`${historyVal}`} height={40} width={40} /></th>) : (<td className="px-6 py-4">{historyVal.toString()}</td>)
+//                     )}
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         </>) : (<></>)}
+
+
+
+//       </div>
+
+
+
+
+
+
+//     </Fragment>
+//   )
+// }
+
+// export const ExchangeToken = ({ gameId }: { gameId: number }) => {
+
+//   const [cookie, setCookie] = useCookies(["eonhub-auth"]);
+//   const userCookie: IEonUserDetail = cookie["eonhub-auth"];
+//   const eonhubAPI = eonhubApiCreate(userCookie?.token);
+
+//   const [swapDirection, setSwapDirection] = useState(false);
+//   const coinsList = COINS_LIST[gameId];
+//   // const [cashSpendSound] = useSound(
+//   //   '/images/sound/Cash_Register.mp3',
+//   //   { volume: 1.00 }
+//   // );
+
+//   return (<>
+//     <div className={`border-2 w-full rounded-2xl bg-white h-fit my-auto transition-all duration-500 ${gameId !== SEAL_METAVERSE_GAME_ID && `opacity-40`}`}>
+//       <div className="border-2 h-auto text-center rounded-2xl py-6 px-4">
+//         <div className="flex justify-center">
+//           <div className="relative">
+//             <div className="text-center">
+//               <Image alt='' src={`${coinsList[0].imgUrl}`} height={50} width={50} />
+//               {/* <div className="absolute bottom-0 right-2">111</div> */}
+//               <div className="absolute -bottom-2 -right-1 bg-black bg-opacity-50 py-1 px-2 rounded-lg">{0}</div>
+//             </div>
+//           </div>
+//         </div>
+//         <div className="flex justify-center py-4 transition-all">
+//           {swapDirection ?
+//             <FontAwesomeIcon icon={faCircleArrowUp} className={`h-12 opacity-70 text-neutral-600 hover:text-neutral-800 hover:opacity-90 cursor-pointer`} onClick={() => {
+//               // cashSpendSound();
+//               setSwapDirection(!swapDirection)
+//             }} />
+//             : <FontAwesomeIcon icon={faCircleArrowDown} className={`h-12 opacity-70 text-neutral-600 hover:text-neutral-800 hover:opacity-90 cursor-pointer`} onClick={() => setSwapDirection(!swapDirection)} />
+//           }
+//         </div>
+//         <div className="flex justify-center ">
+//           <div className="relative">
+//             <div className="text-center">
+//               {/* <Image alt='' src={`/images/zenyCoin.png`} height={125} width={125} /> */}
+//               <Image alt='' src={`${coinsList[1].imgUrl}`} height={75} width={75} />
+//               <div className="absolute -bottom-2 -right-1 bg-black bg-opacity-50 py-1 px-2 rounded-lg">{userCookie?.eonPoint || 0}</div>
+//             </div>
+//           </div>
+//         </div>
+//         <div className="flex justify-center mt-6 border-2 rounded-2xl transition-all duration-500 bg-primary  hover:font-extrabold bg-opacity-60 hover:bg-opacity-100 hover:border-neutral-400">
+//           <button type='button' className={`h-14 `}>EXCHANGE</button>
+//         </div>
+//       </div>
+//     </div>
+//   </>)
+// }
+ 
+// export const Marketplace = () => {
+
+//   const { library, account, chainId, activate, deactivate } = useWeb3React();
+
+//   const [sealMetaverseAccountInfo, setSealMetaverseAccountInfo] = useAtom(SealMetaverseAccountInfoAtom);
+//   const [zeroEternalLoveAccountInfo, setZeroEternalLoveAccountInfo] = useAtom(ZeroEternalLoveAccountInfoAtom);
+
+//   const marketService = new MarketService()
+//   const [marketZero, setMarketZeroAtom] = useAtom(marketZeroAtom);
+
+
+//   const { sign: signWallet } = useWalletSigner(
+//     library as providers.Web3Provider
+//   );
+
+
+//   const [cookie, setCookie, removeCookie] = useCookies(["eonhub-auth"]);
+//   const userCookie: IEonUserDetail = cookie["eonhub-auth"];
+//   const eonhubAPI = eonhubApiCreate(userCookie?.token);
+
+//   const [marketZeroInventory, setmarketZeroInventory] = useAtom(marketZeroInventoryAtom);
+//   const [inventoryZero, setInventoryZero] = useAtom(inventoryZeroAtom);
+
+//   const [selectedServer, setSelectedServer] = useAtom(selectedServerAtom);
+ 
+//   const onBuyMarketItemClick = async (item: MarketList) => {
+
+//     if (!account) return toast.error(`Please connect your wallet !`);
+
+//     const token = await signWallet(); // signWallet is a function from useWalletSigner hook
+
+//     if (!token) return;
+
+//     // const user = marketService.getUserGameInfo(gameId, token, ()=>{}) 
+
+//     Swal.fire({
+//       title: `Buying ${item.itemName}`,
+//       input: "number",
+//       // inputOptions: 2 === ZERO_ETERNAL_LOVE_GAME_ID ? zeroEternalLoveAccountInfo?.characterNames.map(char => char.characterName) :
+//       //   [sealMetaverseAccountInfo?.gameUserId],
+//       showCancelButton: true,
+//       confirmButtonText: "Confirm",
+//       confirmButtonColor: 'rgb(253 120 118 / 1.0)',
+//       showLoaderOnConfirm: true,
+//       inputValidator: (value) => {
+//         // const result = gameId === ZERO_ETERNAL_LOVE_GAME_ID ? zeroEternalLoveAccountInfo?.characterNames[value] : sealMetaverseAccountInfo?.characterNames[value]
+//         // const result: IZeroEternalLoveCharInfo = zeroEternalLoveAccountInfo?.characterNames[value];
+//         return new Promise((resolve) => {
+//           if (!value) {
+//             resolve("Please input an amount to buy.");
+//           } else {
+ 
+//             resolve();
+//           }
+//           resolve()
+//         });
+//       },
+//       preConfirm: async (amount) => {
+//         try {
+//           // After Confirm 
+//           const req = marketService?.buyItem(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token, token, item, amount, selectedServer.serverID)
+//             .finally(() => {
+//               refrestData()
+//               UserService
+//             })
+//           return amount
+//         } catch (error) {
+//           Swal.showValidationMessage(`
+//                 Request failed: ${error}
+//               `);
+//         }
+//       },
+//       allowOutsideClick: () => !Swal.isLoading()
+//     }).then((result) => { });
+//   }
+
+
+//   const userService = new UserService();
+//   const refrestData = () => {
+
+//     if (!userCookie || !userCookie?.token) return
+//     const inventoryZero = marketService.getMyInventory(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//       .then(res => {
+//         setInventoryZero(res)
+//       })
+//       .catch(err => { console.log('inventoryZero: ', err) })
+//     const marketZeroInventory = marketService.getUserMarketInfo(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//       .then(res => {
+//         setmarketZeroInventory(res)
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+//     const marketZeroInventory2 = marketService.getMarketItemList(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//       .then(res => {
+//         const marketItem = res as MarketList[] || [];
+//         setMarketZeroAtom(marketItem)
+//         // setmarketZeroInventory(res)
+//       })
+//       .catch(err => { console.log('marketZeroInventory: ', err) })
+//     userService.fetchUserInfo(userCookie?.token, setCookie, removeCookie, () => { });
+//     // const marketZeroTax = marketService.getMarketTax(ZERO_ETERNAL_LOVE_GAME_ID, userCookie?.token)
+//     // .then(res => {
+//     //   console.log('marketZeroTax: ', res)
+//     //   // setmarketZeroInventory(res)
+//     // })
+//     // .catch(err => { console.log('marketZeroInventory: ', err) })
+//   }
+
+//   const [marketZeroTax, setMarketZeroTax] = useAtom(marketZeroTaxAtom);
+//   const [marketZeroFilter, setMarketZeroFilter] = useState({ type: ``, subtype: `` })
+//   const ROM_MARKET_TYPE = [ `MONEY`,`GIFT_ITEM`]
+//   const ROM_MARKET_SUB_TYPE = [
+//     { type: `MONEY`, subtype: [] },
+//     { type: `GIFT_ITEM`, subtype: [`Card`] }
+//   ]
+
+//   useEffect(() => {
+
+//   }, [marketZero])
+
+//   return (<>
+//     {/* Recently Sold */}
+//     <section className={cn(`py-10`, `lg:pt-0`)}>
+//       <div className={cn(`container`)}>
+//         <h2 className={cn(`text-[64px] font-bold leading-tight`, `lg:text-2xl`)}>On Sales</h2>
+//       </div>
+
+//       <div className={cn(`container relative mt-14`, `lg:mt-6 lg:!px-0`)}>
+//         <div className="flex justify-between text-center gap-4">
+//           <div className="market-filter-type-section w-1/4 border-2 rounded-2xl ">
+//             <div className="flex justify-center mt-2 border-b-2 pb-2 mb-3 w-full">
+//               <h2 className={cn(`text-[28px] font-bold leading-tight   py-1  `, `lg:text-2xl`)}>CATEGORIES</h2>
+//             </div>
+//             {ROM_MARKET_TYPE.map(type => (<>
+//               <div className="flex justify-start mx-2 my-1 text-xl">
+//                 <div className={`w-full py-1  border-2 rounded-lg cursor-pointer ${marketZeroFilter.type == type ? `font-extrabold bg-info bg-opacity-80 text-white` : ``}`} onClick={() => setMarketZeroFilter({ type, subtype: `` })}>{type}</div>
+//               </div>
+//               {ROM_MARKET_SUB_TYPE.find(sub => sub.type == type)?.subtype.map(subtype => (
+//                 <div className={`flex   transition-all duration-200  ${marketZeroFilter.type == type ? `scale-100 mb-3 mt-1` : `h-0 scale-y-0`}`}>
+//                   <div className={`w-full flex ml-6 cursor-pointer ${marketZeroFilter.subtype == subtype ? `font-bold` : ``}`} onClick={() => setMarketZeroFilter({ type: marketZeroFilter.type, subtype })} >
+                     
+//                     <Image alt={`cards.png`} src={`/images/rom/cards.png`} height={40} width={40} />
+//                     <div className="my-auto"> {subtype}</div>
+//                   </div>
+//                 </div>
+//               ))}
+//             </>))
+//             }
+//           </div>
+//           <div className="1 w-full border-2 rounded-2xl p-3">
+//             <div className="grid grid-cols-4 gap-2 max-h-[38rem] overflow-auto">
+//               {marketZero.sort((a, b) => a.eonPriceForEach - b.eonPriceForEach)
+//                 .map((item, n) => ({
+//                   id: `${item?.marketItemId}`,
+//                   image: item?.itemPictureUrl || '/images/zenyCoin.jpeg',
+//                   collection: `${item?.itemType}`,
+//                   name: item?.itemName || ``,
+//                   price: item?.eonPriceForEach,
+//                   priceUSD: (item?.eonPriceForEach / 10),
+//                   createdAt: new Date(item?.createdTime),
+//                   sellerGameUserId: item?.sellerGameUserId,
+//                   chain: {
+//                     symbol: 'bsc',
+//                   },
+//                   item: item
+//                 }))
+//                 .map((recently, recentlyIdx) => marketZeroFilter.type == recently.collection && (
+//                   <SwiperSlide
+//                     onClick={async () => await onBuyMarketItemClick(recently.item)}
+//                     key={`recently-slide-${recentlyIdx}`}
+//                     className={cn(
+//                       `relative p-2`,
+//                       `[&:hover>div]:bg-info`,
+//                       `[&:hover>div]:shadow-recently`,
+//                       `[&:hover>div>.recently-id]:bg-white`,
+//                       `[&:hover>div>.recently-id]:text-info`,
+//                       `[&:hover>div>.recently-id]:rounded-none`,
+//                       `[&:hover]:text-white`,
+//                       `[&:hover_.price]:text-white`,
+//                       // pseudo class
+//                       `[&:hover]:before:rounded-[40px]`,
+//                       `[&:hover]:before:border`,
+//                       `[&:hover]:before:border-info`,
+//                       `[&:hover]:before:inset-0`,
+//                       `[&:hover]:before:absolute`,
+//                       `[&:hover]:before:pointer-events-none`,
+//                       `[&:hover]:before:-z-10`,
+//                     )}
+//                   >
+//                     <div className={cn(`rounded-[32px] bg-card p-8`, `transition-all duration-300`, `lg:p-5`)}>
+//                       <div className={cn(`recently-id inline-block rounded-full bg-info px-2 text-white`)}>
+//                         #{recently.id}
+//                       </div>
+//                       <div className={cn(`mt-2 flex items-center space-x-2`)}>
+//                         <div className={cn(`flex-1 truncate font-semibold`)}>{recently.collection}</div>
+//                         <Image src={`/images/chains/${recently.chain.symbol}.png`} alt="" width={24} height={24} />
+//                       </div>
+//                       <div className={cn(`mt-4 flex aspect-square items-center justify-center rounded-2xl bg-white p-2`)}>
+//                         <Image
+//                           src={recently.image}
+//                           alt=""
+//                           width={176}
+//                           height={176}
+//                           className={cn(`h-full w-full object-contain`)}
+//                           priority
+//                         />
+//                       </div>
+//                       <div className={cn(`mt-4 space-y-2`)}>
+//                         {/* {recently?.sellerGameUserId} */}
+//                         <h5 className={cn(`text-[32px] font-bold`)}>{recently.name}</h5>
+//                         <div>Quantity: {recently.item.itemAmount.toLocaleString('en-US', {})}</div>
+//                         <div>
+//                           <div className={cn(`price text-xl font-bold text-success`, `transition-all duration-300`)}>
+//                             {recently.price} EON
+//                           </div>
+//                           <div>{(recently.priceUSD).toFixed(2)} USD</div>
+//                         </div>
+//                         <div className={cn(`text-xs`)}>{format(recently.createdAt, 'MMM dd yyyy, HH:mm')}</div>
+//                       </div>
+//                     </div>
+//                   </SwiperSlide>
+//                 )
+//                 )
+//               }
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div className={cn(`container relative mt-14`, `lg:mt-6 lg:!px-0`)}>
+//         <Swiper
+//           navigation={{
+//             prevEl: '#recently-navigation-prev',
+//             nextEl: '#recently-navigation-next',
+//           }}
+//           modules={[Navigation]}
+//           className={cn(`[&>.swiper-wrapper]:pb-4`)}
+//           breakpoints={{
+//             319: {
+//               slidesPerView: 1.35,
+//               spaceBetween: 4,
+//               slidesOffsetBefore: 20,
+//               slidesOffsetAfter: 20,
+//             },
+//             641: {
+//               slidesPerView: 2.5,
+//               spaceBetween: 10,
+//               slidesOffsetBefore: 32,
+//               slidesOffsetAfter: 32,
+//             },
+//             1025: {
+//               slidesPerView: 4,
+//               spaceBetween: 8,
+//             },
+//           }}
+//         >
+//           {marketZero.sort((a, b) => a.eonPriceForEach - b.eonPriceForEach)
+//             .map((item, n) => ({
+//               id: `${item?.marketItemId}`,
+//               image: item?.itemPictureUrl || '/images/zenyCoin.jpeg',
+//               collection: `${item?.itemType}`,
+//               name: item?.itemName || ``,
+//               price: item?.eonPriceForEach,
+//               priceUSD: (item?.eonPriceForEach / 10),
+//               createdAt: new Date(item?.createdTime),
+//               sellerGameUserId: item?.sellerGameUserId,
+//               chain: {
+//                 symbol: 'bsc',
+//               },
+//               item: item
+//             }))
+//             .map((recently, recentlyIdx) => recently.item.itemType === `MONEY` && (
+//               <SwiperSlide
+//                 onClick={async () => await onBuyMarketItemClick(recently.item)}
+//                 key={`recently-slide-${recentlyIdx}`}
+//                 className={cn(
+//                   `relative p-2`,
+//                   `[&:hover>div]:bg-info`,
+//                   `[&:hover>div]:shadow-recently`,
+//                   `[&:hover>div>.recently-id]:bg-white`,
+//                   `[&:hover>div>.recently-id]:text-info`,
+//                   `[&:hover>div>.recently-id]:rounded-none`,
+//                   `[&:hover]:text-white`,
+//                   `[&:hover_.price]:text-white`,
+//                   // pseudo class
+//                   `[&:hover]:before:rounded-[40px]`,
+//                   `[&:hover]:before:border`,
+//                   `[&:hover]:before:border-info`,
+//                   `[&:hover]:before:inset-0`,
+//                   `[&:hover]:before:absolute`,
+//                   `[&:hover]:before:pointer-events-none`,
+//                   `[&:hover]:before:-z-10`,
+//                 )}
+//               >
+//                 <div className={cn(`rounded-[32px] bg-card p-8`, `transition-all duration-300`, `lg:p-5`)}>
+//                   <div className={cn(`recently-id inline-block rounded-full bg-info px-2 text-white`)}>
+//                     #{recently.id}
+//                   </div>
+//                   <div className={cn(`mt-2 flex items-center space-x-2`)}>
+//                     <div className={cn(`flex-1 truncate font-semibold`)}>{recently.collection}</div>
+//                     <Image src={`/images/chains/${recently.chain.symbol}.png`} alt="" width={24} height={24} />
+//                   </div>
+//                   <div className={cn(`mt-4 flex aspect-square items-center justify-center rounded-2xl bg-white p-2`)}>
+//                     <Image
+//                       src={recently.image}
+//                       alt=""
+//                       width={176}
+//                       height={176}
+//                       className={cn(`h-full w-full object-contain`)}
+//                       priority
+//                     />
+//                   </div>
+//                   <div className={cn(`mt-4 space-y-2`)}>
+//                     {/* {recently?.sellerGameUserId} */}
+//                     <h5 className={cn(`text-[32px] font-bold`)}>{recently.name}</h5>
+//                     <div>Quantity: {recently.item.itemAmount.toLocaleString('en-US', {})}</div>
+//                     <div>
+//                       <div className={cn(`price text-xl font-bold text-success`, `transition-all duration-300`)}>
+//                         {recently.price} EON
+//                       </div>
+//                       <div>{(recently.priceUSD).toFixed(2)} USD</div>
+//                     </div>
+//                     <div className={cn(`text-xs`)}>{format(recently.createdAt, 'MMM dd yyyy, HH:mm')}</div>
+//                   </div>
+//                 </div>
+//               </SwiperSlide>
+//             )
+//             )
+//           }
+
+//         </Swiper>
+
+//         {/* Navigation */}
+//         <div
+//           className={cn(
+//             `pointer-events-none absolute -left-10 -right-10 top-1/2 z-10 -translate-y-1/2`,
+//             `3xl:-left-6 3xl:-right-6`,
+//             `lg:relative lg:left-0 lg:right-0 lg:top-0 lg:translate-y-0 lg:px-8`,
+//             `sm:px-5`,
+//           )}
+//         >
+//           <div className={cn(`flex items-center justify-between`)}>
+//             <button id="recently-navigation-prev" className={cn(`pointer-events-auto disabled:opacity-40`)}>
+//               <IconArrowCircleLeft className={cn(`text-[56px] text-info`)} />
+//             </button>
+//             <button id="recently-navigation-next" className={cn(`pointer-events-auto disabled:opacity-40`)}>
+//               <IconArrowCircleRight className={cn(`text-[56px] text-info`)} />
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div className={cn(`container relative mt-14`, `lg:mt-6 lg:!px-0`)}>
+//         <Swiper
+//           navigation={{
+//             prevEl: '#recently-navigation-2-prev',
+//             nextEl: '#recently-navigation-2-next',
+//           }}
+//           modules={[Navigation]}
+//           className={cn(`[&>.swiper-wrapper]:pb-4`)}
+//           breakpoints={{
+//             319: {
+//               slidesPerView: 1.35,
+//               spaceBetween: 4,
+//               slidesOffsetBefore: 20,
+//               slidesOffsetAfter: 20,
+//             },
+//             641: {
+//               slidesPerView: 2.5,
+//               spaceBetween: 10,
+//               slidesOffsetBefore: 32,
+//               slidesOffsetAfter: 32,
+//             },
+//             1025: {
+//               slidesPerView: 4,
+//               spaceBetween: 8,
+//             },
+//           }}
+//         >
+//           {marketZero
+//             .map((item, n) => ({
+//               id: `${item?.marketItemId}`,
+//               image: item?.itemPictureUrl || '/images/zenyCoin.jpeg',
+//               collection: `${item?.itemType}`,
+//               name: item?.itemName || ``,
+//               price: item?.eonPriceForEach,
+//               priceUSD: (item?.eonPriceForEach / 10),
+//               createdAt: new Date(item?.createdTime),
+//               chain: {
+//                 symbol: 'bsc',
+//               },
+//               item: item
+//             }))
+//             .map((recently, recentlyIdx) => recently.item.itemType != `MONEY` && (
+//               <SwiperSlide
+//                 onClick={async () => await onBuyMarketItemClick(recently.item)}
+//                 key={`recently-slide-${recentlyIdx}`}
+//                 className={cn(
+//                   `relative p-2`,
+//                   `[&:hover>div]:bg-info`,
+//                   `[&:hover>div]:shadow-recently`,
+//                   `[&:hover>div>.recently-id]:bg-white`,
+//                   `[&:hover>div>.recently-id]:text-info`,
+//                   `[&:hover>div>.recently-id]:rounded-none`,
+//                   `[&:hover]:text-white`,
+//                   `[&:hover_.price]:text-white`,
+//                   // pseudo class
+//                   `[&:hover]:before:rounded-[40px]`,
+//                   `[&:hover]:before:border`,
+//                   `[&:hover]:before:border-info`,
+//                   `[&:hover]:before:inset-0`,
+//                   `[&:hover]:before:absolute`,
+//                   `[&:hover]:before:pointer-events-none`,
+//                   `[&:hover]:before:-z-10`,
+//                 )}
+//               >
+//                 <div className={cn(`rounded-[32px] bg-card p-8`, `transition-all duration-300`, `lg:p-5`)}>
+//                   <div className={cn(`recently-id inline-block rounded-full bg-info px-2 text-white`)}>
+//                     #{recently.id}
+//                   </div>
+//                   <div className={cn(`mt-2 flex items-center space-x-2`)}>
+//                     <div className={cn(`flex-1 truncate font-semibold`)}>{recently.collection}</div>
+//                     <Image src={`/images/chains/${recently.chain.symbol}.png`} alt="" width={24} height={24} />
+//                   </div>
+//                   <div className={cn(`mt-4 flex aspect-square items-center justify-center rounded-2xl bg-white p-2`)}>
+//                     <Image
+//                       src={recently.image}
+//                       alt=""
+//                       width={176}
+//                       height={176}
+//                       className={cn(`h-full w-full object-contain`)}
+//                       priority
+//                     />
+//                   </div>
+//                   <div className={cn(`mt-4 space-y-2`)}>
+//                     <h5 className={cn(`text-[32px] font-bold`)}>{recently.name}</h5>
+//                     <div>Quantity: {recently.item.itemAmount.toLocaleString('en-US', {})}</div>
+//                     <div>
+//                       <div className={cn(`price text-xl font-bold text-success`, `transition-all duration-300`)}>
+//                         {recently.price} EON
+//                       </div>
+//                       <div>{(recently.priceUSD).toFixed(2)} USD</div>
+//                     </div>
+//                     <div className={cn(`text-xs`)}>{format(recently.createdAt, 'MMM dd yyyy, HH:mm')}</div>
+//                   </div>
+//                 </div>
+//               </SwiperSlide>
+//             )
+//             )
+//           }
+
+//         </Swiper>
+
+//         {/* Navigation */}
+//         <div
+//           className={cn(
+//             `pointer-events-none absolute -left-10 -right-10 top-1/2 z-10 -translate-y-1/2`,
+//             `3xl:-left-6 3xl:-right-6`,
+//             `lg:relative lg:left-0 lg:right-0 lg:top-0 lg:translate-y-0 lg:px-8`,
+//             `sm:px-5`,
+//           )}
+//         >
+//           <div className={cn(`flex items-center justify-between`)}>
+//             <button id="recently-navigation-2-prev" className={cn(`pointer-events-auto disabled:opacity-40`)}>
+//               <IconArrowCircleLeft className={cn(`text-[56px] text-info`)} />
+//             </button>
+//             <button id="recently-navigation-2-next" className={cn(`pointer-events-auto disabled:opacity-40`)}>
+//               <IconArrowCircleRight className={cn(`text-[56px] text-info`)} />
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div className="container">
+//         <p className="1 inline  ">
+//           Current Marketplace TAX:
+//         </p>
+//         <p className="2 inline ml-1 font-bold">
+//           {(marketZeroTax.totalTax).toLocaleString('en-US', { maximumFractionDigits: 0 })} EON
+//         </p>
+//       </div>
+//     </section>
+//   </>)
+// }
+
+// export const RecentlySold = () => {
+//   const [marketHistoryZero, setMarketHistoryZero] = useAtom(marketHistoryZeroAtom);
+//   const [historyType, setHistoryType] = useAtom(displayMarketZeroHistoryAtom);
+//   return (<>
+//     {/* Recently Sold */}
+//     <section className={cn(`py-10`, `lg:pt-0 `)}>
+//       {!marketHistoryZero || !marketHistoryZero.length ? (<></>) : (<>
+//         <div className={cn(`container  `)}>
+//           <h2 className={cn(`text-[64px] font-bold leading-tight`, `lg:text-2xl`)}>Recently Sold</h2>
+//           <div className="flex gap-4">
+//             <h5 className={`cursor-pointer ${historyType == `Recommended` && `font-bold`}`} onClick={() => setHistoryType(`Recommended`)}>Recommended</h5>
+//             <h5 className={`cursor-pointer ${historyType == `Latest` && `font-bold`}`} onClick={() => setHistoryType(`Latest`)}>Latest</h5>
+//           </div>
+//         </div>
+//       </>)}
+
+//       <div className={cn(`container relative mt-14`, `lg:mt-6 lg:!px-0`)}>
+//         <Swiper
+//           navigation={{
+//             prevEl: '#recently-navigation-prev',
+//             nextEl: '#recently-navigation-next',
+//           }}
+//           modules={[Navigation]}
+//           className={cn(`[&>.swiper-wrapper]:pb-4`)}
+//           breakpoints={{
+//             319: {
+//               slidesPerView: 1.35,
+//               spaceBetween: 4,
+//               slidesOffsetBefore: 20,
+//               slidesOffsetAfter: 20,
+//             },
+//             641: {
+//               slidesPerView: 2.5,
+//               spaceBetween: 10,
+//               slidesOffsetBefore: 32,
+//               slidesOffsetAfter: 32,
+//             },
+//             1025: {
+//               slidesPerView: 4,
+//               spaceBetween: 8,
+//             },
+//           }}
+//         >
+//           {/* {[...Array(5).keys()] */}
+//           {!marketHistoryZero?.length ? (<></>) :
+//             marketHistoryZero.sort((a, b) => historyType == `Recommended` ? (b.price / b.itemAmount) - (a.price / a.itemAmount) : b.marketHistoryId - a.marketHistoryId)
+//               .map((n) => ({
+//                 id: `${n.marketHistoryId}`,
+//                 image: `${n.itemPictureUrl.length > 10 ? n.itemPictureUrl : `/images/chains/bsc.png`}`,
+//                 collection: 'ZERO - Eternal Nexus M',
+//                 name: `${n.itemName}`,
+//                 price: n.price,
+//                 priceUSD: n.price,
+//                 createdAt: new Date(`${n.actionTime}`),
+//                 amount: n.itemAmount,
+//                 chain: {
+//                   symbol: 'bsc',
+//                 },
+//               }))
+//               .map((recently, recentlyIdx) => (
+//                 <SwiperSlide
+//                   key={`recently-slide-${recentlyIdx}`}
+//                   className={cn(
+//                     `relative p-2`,
+//                     `[&:hover>div]:bg-info`,
+//                     `[&:hover>div]:shadow-recently`,
+//                     `[&:hover>div>.recently-id]:bg-white`,
+//                     `[&:hover>div>.recently-id]:text-info`,
+//                     `[&:hover>div>.recently-id]:rounded-none`,
+//                     `[&:hover]:text-white`,
+//                     `[&:hover_.price]:text-white`,
+//                     // pseudo class
+//                     `[&:hover]:before:rounded-[40px]`,
+//                     `[&:hover]:before:border`,
+//                     `[&:hover]:before:border-info`,
+//                     `[&:hover]:before:inset-0`,
+//                     `[&:hover]:before:absolute`,
+//                     `[&:hover]:before:pointer-events-none`,
+//                     `[&:hover]:before:-z-10`,
+//                   )}
+//                 >
+//                   <div className={cn(`rounded-[32px] bg-card p-8`, `transition-all duration-300`, `lg:p-5`)}>
+//                     <div className={cn(`recently-id inline-block rounded-full bg-info px-2 text-white`)}>
+//                       #{recently.id}
+//                     </div>
+//                     <div className={cn(`mt-2 flex items-center space-x-2`)}>
+//                       <div className={cn(`flex-1 truncate font-semibold`)}>{recently.collection}</div>
+//                       <Image src={`/images/chains/${recently.chain.symbol}.png`} alt="" width={24} height={24} />
+//                     </div>
+//                     <div className={cn(`mt-4 flex aspect-square items-center justify-center rounded-2xl bg-white p-2`)}>
+//                       <Image
+//                         src={recently.image || `ggg`}
+//                         alt=""
+//                         width={176}
+//                         height={176}
+//                         className={cn(`h-full w-full object-contain`)}
+//                         priority
+//                       />
+//                     </div>
+//                     <div className={cn(`mt-4 space-y-2`)}>
+//                       <h5 className={cn(`text-[32px] font-bold inline`)}>{recently.name}</h5>
+//                       {recently.amount > 1 && <div className={cn(`text-[18px] font-bold inline ml-1`)}>x{recently.amount}</div>}
+//                       <div>
+//                         <div className={cn(`price text-xl font-bold text-success`, `transition-all duration-300`)}>
+//                           {recently.amount > 1 ? `${recently.amount}x ${(recently.price) / recently.amount} EON` : `${recently.price} EON`}
+//                         </div>
+//                         <div> {recently.amount > 1 ? `${recently.amount}x ${((recently.priceUSD / 10) / recently.amount).toFixed(2)} USD` : ` ${(recently.priceUSD / 10).toFixed(2)} USD`}</div>
+//                       </div>
+//                       <div className={cn(`text-xs`)}>{format(recently.createdAt, 'MMM dd yyyy, HH:mm')}</div>
+//                     </div>
+//                   </div>
+//                 </SwiperSlide>
+//               ))}
+//         </Swiper>
+
+//         {/* Navigation */}
+//         <div
+//           className={cn(
+//             `pointer-events-none absolute -left-10 -right-10 top-1/2 z-10 -translate-y-1/2`,
+//             `3xl:-left-6 3xl:-right-6`,
+//             `lg:relative lg:left-0 lg:right-0 lg:top-0 lg:translate-y-0 lg:px-8`,
+//             `sm:px-5`,
+//           )}
+//         >
+//           <div className={cn(`flex items-center justify-between`)}>
+//             <button id="recently-navigation-prev" className={cn(`pointer-events-auto disabled:opacity-40`)}>
+//               <IconArrowCircleLeft className={cn(`text-[56px] text-info`)} />
+//             </button>
+//             <button id="recently-navigation-next" className={cn(`pointer-events-auto disabled:opacity-40`)}>
+//               <IconArrowCircleRight className={cn(`text-[56px] text-info`)} />
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   </>)
+// }
+
+// export default Page

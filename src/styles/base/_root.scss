@@ -1,0 +1,10 @@
+@layer base {
+  :root {
+    --navbar-h: 104px;
+    --rk-fonts-body: var(--font-sans);
+  }
+
+  [data-rk] {
+    --rk-fonts-body: var(--font-sans) !important;
+  }
+}

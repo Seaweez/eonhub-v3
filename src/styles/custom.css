@@ -1,0 +1,39 @@
+.Toastify__toast {
+  color: black !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-confirm::after {
+  border-color: #fff !important;
+}
+
+.Toastify__toast--success {
+  background: white !important;
+}
+
+.swal2-modal {
+  border-radius: 1rem;
+  input[type=number] {
+    text-align: center;
+    border-radius: 10rem;
+  }
+}
+
+.support-ticket {
+  input {
+    text-align: center;
+    border-radius: 0.125rem;
+    border-width: 1px;
+    margin-top: 0.25rem;
+  }
+}
+
+#hero-bullet-slide{
+  z-index: 100;
+  margin-top: -2rem !important;
+}
+
+.react-multiple-carousel__arrow{
+  
+}

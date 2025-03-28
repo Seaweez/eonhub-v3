@@ -1,0 +1,29 @@
+#hero-bullet-slide {
+  --swiper-pagination-bullet-horizontal-gap: 8px;
+  --swiper-pagination-color: theme('colors.secondary/20%');
+  --swiper-pagination-bullet-inactive-color: white;
+  --swiper-pagination-bullet-size: 24px;
+
+  .swiper-pagination-bullet {
+    @apply relative;
+
+
+    &::after {
+      @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-secondary w-3 h-3 rounded-full;
+
+      content: '';
+    }
+
+    &:first-child {
+      @apply ml-0;
+    }
+
+    &:last-child {
+      @apply mr-0;
+    }
+    
+    &.swiper-pagination-bullet-active {
+      border-color: theme('colors.secondary/10')
+    }
+  }
+}
